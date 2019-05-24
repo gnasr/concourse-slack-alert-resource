@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/arbourd/concourse-slack-alert-resource/concourse"
-	"github.com/arbourd/concourse-slack-alert-resource/slack"
+	"github.com/gnasr/concourse-slack-alert-resource/concourse"
+	"github.com/gnasr/concourse-slack-alert-resource/slack"
 )
 
 func buildMessage(alert Alert, m concourse.BuildMetadata) *slack.Message {
@@ -71,7 +71,11 @@ func out(input *concourse.OutRequest) (*concourse.OutResponse, error) {
 		return nil, errors.New("slack webhook url cannot be blank")
 	}
 
-	alert := NewAlert(input)
+	alert, err := NewAlert(input)
+	if err != nil {
+		return nil, err
+	}
+
 	metadata := concourse.NewBuildMetadata(input.Source.ConcourseURL)
 	send := !alert.Disabled
 

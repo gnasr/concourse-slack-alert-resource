@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/arbourd/concourse-slack-alert-resource/concourse"
-	"github.com/arbourd/concourse-slack-alert-resource/slack"
+	"github.com/gnasr/concourse-slack-alert-resource/concourse"
+	"github.com/gnasr/concourse-slack-alert-resource/slack"
 )
 
 func TestOut(t *testing.T) {

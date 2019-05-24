@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/arbourd/concourse-slack-alert-resource/concourse"
+	"github.com/gnasr/concourse-slack-alert-resource/concourse"
 )
 
 func main() {

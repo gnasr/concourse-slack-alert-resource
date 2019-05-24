@@ -48,6 +48,7 @@ Sends a structured message to Slack based on the alert type.
 - `channel`: *Optional.* Channel where this message is posted. Defaults to the `channel` setting in Source.
 - `message`: *Optional.* The status message at the top of the alert. Defaults to name of alert type.
 - `color`: *Optional.* The color of the notification bar as a hexadecimal. Defaults to the icon color of the alert type.
+- `attachments`: *Optional.* A extra message to add, for example a link. It supports the expansion of env variables
 - `disable`: *Optional.* Disables the alert. Defaults to `false`.
 
 #### Alert Types
@@ -104,6 +105,7 @@ jobs:
     params:
       message: Completed
       color: "#eeeeee"
+      attachments: "http://example.com/outputs/$BUILD_PIPELINE_NAME-$BUILD_JOB_NAME-$BUILD_NAME.txt"
 ```
 
 Using built-in alert types with appropriate build hooks:

@@ -20,7 +20,7 @@ func TestNewAlert(t *testing.T) {
 		"custom params": {
 			input: &concourse.OutRequest{
 				Source: concourse.Source{Channel: "general"},
-				Params: concourse.OutParams{Channel: "custom-channel", Color: "#ffffff", Message: "custom-message", Disable: true},
+				Params: concourse.OutParams{Channel: "custom-channel", Color: "#ffffff", Message: "custom-message", Disable: true, Attachments: "http://example.com/report.txt"},
 			},
 			want: Alert{Type: "default", Channel: "custom-channel", Color: "#ffffff", IconURL: "https://ci.concourse-ci.org/public/images/favicon-pending.png", Message: "custom-message", Disabled: true},
 		},

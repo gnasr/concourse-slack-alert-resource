@@ -31,6 +31,11 @@ func buildMessage(alert Alert, m concourse.BuildMetadata) *slack.Message {
 				Value: m.BuildName,
 				Short: true,
 			},
+			slack.Field{
+				Title: "Attachments",
+				Value: alert.Attachments,
+				Short: true,
+			},
 		},
 	}
 

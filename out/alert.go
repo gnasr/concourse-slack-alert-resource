@@ -4,66 +4,80 @@ import "github.com/arbourd/concourse-slack-alert-resource/concourse"
 
 // An Alert defines the notification that will be sent to Slack.
 type Alert struct {
-	Type     string
-	Channel  string
-	Color    string
-	IconURL  string
-	Message  string
-	Disabled bool
+	Type        string
+	Channel     string
+	Color       string
+	IconURL     string
+	Message     string
+	Disabled    bool
+	Attachments string
 }
 
 // NewAlert constructs and returns an Alert.
 func NewAlert(input *concourse.OutRequest) Alert {
 	var alert Alert
+	var attachments = input.Params.Attachments
+
+	if attachments == "" {
+		attachments = "---"
+	}
+
 	switch input.Params.AlertType {
 	case "success":
 		alert = Alert{
-			Type:    "success",
-			Color:   "#32cd32",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-succeeded.png",
-			Message: "Success",
+			Type:        "success",
+			Color:       "#32cd32",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-succeeded.png",
+			Message:     "Success",
+			Attachments: attachments,
 		}
 	case "failed":
 		alert = Alert{
-			Type:    "failed",
-			Color:   "#d00000",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-failed.png",
-			Message: "Failed",
+			Type:        "failed",
+			Color:       "#d00000",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-failed.png",
+			Message:     "Failed",
+			Attachments: attachments,
 		}
 	case "started":
 		alert = Alert{
-			Type:    "started",
-			Color:   "#f7cd42",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-started.png",
-			Message: "Started",
+			Type:        "started",
+			Color:       "#f7cd42",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-started.png",
+			Message:     "Started",
+			Attachments: input.Params.Attachments,
 		}
 	case "aborted":
 		alert = Alert{
-			Type:    "aborted",
-			Color:   "#8d4b32",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-aborted.png",
-			Message: "Aborted",
+			Type:        "aborted",
+			Color:       "#8d4b32",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-aborted.png",
+			Message:     "Aborted",
+			Attachments: input.Params.Attachments,
 		}
 	case "fixed":
 		alert = Alert{
-			Type:    "fixed",
-			Color:   "#32cd32",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-succeeded.png",
-			Message: "Fixed",
+			Type:        "fixed",
+			Color:       "#32cd32",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-succeeded.png",
+			Message:     "Fixed",
+			Attachments: input.Params.Attachments,
 		}
 	case "broke":
 		alert = Alert{
-			Type:    "broke",
-			Color:   "#d00000",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-failed.png",
-			Message: "Broke",
+			Type:        "broke",
+			Color:       "#d00000",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-failed.png",
+			Message:     "Broke",
+			Attachments: input.Params.Attachments,
 		}
 	default:
 		alert = Alert{
-			Type:    "default",
-			Color:   "#35495c",
-			IconURL: "https://ci.concourse-ci.org/public/images/favicon-pending.png",
-			Message: "",
+			Type:        "default",
+			Color:       "#35495c",
+			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-pending.png",
+			Message:     "",
+			Attachments: input.Params.Attachments,
 		}
 	}
 

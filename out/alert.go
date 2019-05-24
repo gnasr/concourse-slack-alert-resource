@@ -1,6 +1,11 @@
 package main
 
-import "github.com/arbourd/concourse-slack-alert-resource/concourse"
+import (
+	"fmt"
+
+	"github.com/a8m/envsubst"
+	"github.com/gnasr/concourse-slack-alert-resource/concourse"
+)
 
 // An Alert defines the notification that will be sent to Slack.
 type Alert struct {
@@ -14,9 +19,13 @@ type Alert struct {
 }
 
 // NewAlert constructs and returns an Alert.
-func NewAlert(input *concourse.OutRequest) Alert {
+func NewAlert(input *concourse.OutRequest) (Alert, error) {
 	var alert Alert
-	var attachments = input.Params.Attachments
+
+	attachments, err := envsubst.String(input.Params.Attachments)
+	if err != nil {
+		return Alert{}, fmt.Errorf("Error while substituting varible: %s", err)
+	}
 
 	if attachments == "" {
 		attachments = "---"
@@ -96,5 +105,5 @@ func NewAlert(input *concourse.OutRequest) Alert {
 		alert.Color = input.Params.Color
 	}
 
-	return alert
+	return alert, err
 }

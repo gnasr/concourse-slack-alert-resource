@@ -45,7 +45,7 @@ func NewAlert(input *concourse.OutRequest) Alert {
 			Color:       "#f7cd42",
 			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-started.png",
 			Message:     "Started",
-			Attachments: input.Params.Attachments,
+			Attachments: attachments,
 		}
 	case "aborted":
 		alert = Alert{
@@ -53,7 +53,7 @@ func NewAlert(input *concourse.OutRequest) Alert {
 			Color:       "#8d4b32",
 			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-aborted.png",
 			Message:     "Aborted",
-			Attachments: input.Params.Attachments,
+			Attachments: attachments,
 		}
 	case "fixed":
 		alert = Alert{
@@ -61,7 +61,7 @@ func NewAlert(input *concourse.OutRequest) Alert {
 			Color:       "#32cd32",
 			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-succeeded.png",
 			Message:     "Fixed",
-			Attachments: input.Params.Attachments,
+			Attachments: attachments,
 		}
 	case "broke":
 		alert = Alert{
@@ -69,7 +69,7 @@ func NewAlert(input *concourse.OutRequest) Alert {
 			Color:       "#d00000",
 			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-failed.png",
 			Message:     "Broke",
-			Attachments: input.Params.Attachments,
+			Attachments: attachments,
 		}
 	default:
 		alert = Alert{
@@ -77,7 +77,7 @@ func NewAlert(input *concourse.OutRequest) Alert {
 			Color:       "#35495c",
 			IconURL:     "https://ci.concourse-ci.org/public/images/favicon-pending.png",
 			Message:     "",
-			Attachments: input.Params.Attachments,
+			Attachments: attachments,
 		}
 	}
 

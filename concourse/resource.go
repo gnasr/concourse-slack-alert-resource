@@ -37,6 +37,7 @@ type OutParams struct {
 	Disable     bool   `json:"disable"`
 	Channel     string `json:"channel"`
 	Attachments string `json:"attachments"`
+	FilePath    string `json:"file_path"`
 }
 
 // OutRequest is in the input for the out operation.

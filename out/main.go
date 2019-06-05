@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gnasr/concourse-slack-alert-resource/concourse"
@@ -66,7 +68,7 @@ func previousBuildStatus(input *concourse.OutRequest, m concourse.BuildMetadata)
 	return previous.Status, nil
 }
 
-func out(input *concourse.OutRequest) (*concourse.OutResponse, error) {
+func out(input *concourse.OutRequest, src string) (*concourse.OutResponse, error) {
 	if input.Source.URL == "" {
 		return nil, errors.New("slack webhook url cannot be blank")
 	}
@@ -113,7 +115,23 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	o, err := out(input)
+	if len(os.Args) < 2 {
+		log.Fatalln("destination path not specified:", err)
+		os.Exit(1)
+		return
+	}
+
+	src := os.Args[1]
+	if input.Params.FilePath != "" {
+		filepath := filepath.Join(src, input.Params.FilePath)
+		content, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		input.Params.Attachments = string(content)
+	}
+
+	o, err := out(input, src)
 	if err != nil {
 		log.Fatalln(err)
 	}

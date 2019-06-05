@@ -16,6 +16,7 @@ type Alert struct {
 	Message     string
 	Disabled    bool
 	Attachments string
+	File        string
 }
 
 // NewAlert constructs and returns an Alert.

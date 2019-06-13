@@ -63,15 +63,13 @@ func buildMessage(alert Alert, m concourse.BuildMetadata, src string) *slack.Mes
 		},
 	}
 
-	fields = append(fields, attachmentFields...)
-
 	attachment := slack.Attachment{
 		Fallback:   fallback,
 		AuthorName: alert.Message,
 		Color:      alert.Color,
 		Footer:     m.URL,
 		FooterIcon: alert.IconURL,
-		Fields:     fields,
+		Fields:     append(fields, attachmentFields...),
 	}
 
 	return &slack.Message{Attachments: []slack.Attachment{attachment}, Channel: alert.Channel}

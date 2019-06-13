@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/a8m/envsubst"
@@ -14,7 +15,7 @@ import (
 	"github.com/gnasr/concourse-slack-alert-resource/slack"
 )
 
-func parseAttachments(att []concourse.AttachmentMap) []slack.Field {
+func parseAttachments(att []concourse.AttachmentMap, src string) []slack.Field {
 	var parsedFields []slack.Field
 	for _, v := range att {
 		attachmentField := slack.Field{
@@ -23,7 +24,7 @@ func parseAttachments(att []concourse.AttachmentMap) []slack.Field {
 
 		// If filepath is not empty set the content as value
 		if v.File != "" {
-			content, err := ioutil.ReadFile(v.File)
+			content, err := ioutil.ReadFile(filepath.Join(src, v.File))
 			if err != nil {
 				log.Fatalln("error reading file:", err)
 			}
@@ -46,9 +47,9 @@ func parseAttachments(att []concourse.AttachmentMap) []slack.Field {
 	return parsedFields
 }
 
-func buildMessage(alert Alert, m concourse.BuildMetadata) *slack.Message {
+func buildMessage(alert Alert, m concourse.BuildMetadata, src string) *slack.Message {
 	fallback := fmt.Sprintf("%s -- %s", fmt.Sprintf("%s: %s/%s/%s", alert.Message, m.PipelineName, m.JobName, m.BuildName), m.URL)
-	attachmentFields := parseAttachments(alert.Attachments)
+	attachmentFields := parseAttachments(alert.Attachments, src)
 	fields := []slack.Field{
 		slack.Field{
 			Title: "Job",
@@ -119,7 +120,7 @@ func out(input *concourse.OutRequest, src string) (*concourse.OutResponse, error
 	}
 
 	if send {
-		message := buildMessage(alert, metadata)
+		message := buildMessage(alert, metadata, src)
 		err := slack.Send(input.Source.URL, message)
 		if err != nil {
 			return nil, err

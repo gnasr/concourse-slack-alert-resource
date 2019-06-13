@@ -7,38 +7,70 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 
+	"github.com/a8m/envsubst"
 	"github.com/gnasr/concourse-slack-alert-resource/concourse"
 	"github.com/gnasr/concourse-slack-alert-resource/slack"
 )
 
+func parseAttachments(att []concourse.AttachmentMap) []slack.Field {
+	var parsedFields []slack.Field
+	for _, v := range att {
+		attachmentField := slack.Field{
+			Title: v.Name,
+		}
+
+		// If filepath is not empty set the content as value
+		if v.File != "" {
+			content, err := ioutil.ReadFile(v.File)
+			if err != nil {
+				log.Fatalln("error reading file:", err)
+			}
+			attachmentField.Value = string(content)
+			// If filepath is not defined set the value field
+		} else if v.Value != "" {
+			attachmentField.Value = v.Value
+		}
+
+		// Parse environment variables in content
+		envSubstValue, err := envsubst.String(attachmentField.Value)
+		if err != nil {
+			log.Fatalln("error while substituing variable:", err)
+		}
+
+		attachmentField.Value = envSubstValue
+		parsedFields = append(parsedFields, attachmentField)
+	}
+
+	return parsedFields
+}
+
 func buildMessage(alert Alert, m concourse.BuildMetadata) *slack.Message {
 	fallback := fmt.Sprintf("%s -- %s", fmt.Sprintf("%s: %s/%s/%s", alert.Message, m.PipelineName, m.JobName, m.BuildName), m.URL)
+	attachmentFields := parseAttachments(alert.Attachments)
+	fields := []slack.Field{
+		slack.Field{
+			Title: "Job",
+			Value: fmt.Sprintf("%s/%s", m.PipelineName, m.JobName),
+			Short: true,
+		},
+		slack.Field{
+			Title: "Build",
+			Value: m.BuildName,
+			Short: true,
+		},
+	}
+
+	fields = append(fields, attachmentFields...)
+
 	attachment := slack.Attachment{
 		Fallback:   fallback,
 		AuthorName: alert.Message,
 		Color:      alert.Color,
 		Footer:     m.URL,
 		FooterIcon: alert.IconURL,
-		Fields: []slack.Field{
-			slack.Field{
-				Title: "Job",
-				Value: fmt.Sprintf("%s/%s", m.PipelineName, m.JobName),
-				Short: true,
-			},
-			slack.Field{
-				Title: "Build",
-				Value: m.BuildName,
-				Short: true,
-			},
-			slack.Field{
-				Title: "Attachments",
-				Value: alert.Attachments,
-				Short: true,
-			},
-		},
+		Fields:     fields,
 	}
 
 	return &slack.Message{Attachments: []slack.Attachment{attachment}, Channel: alert.Channel}
@@ -73,10 +105,7 @@ func out(input *concourse.OutRequest, src string) (*concourse.OutResponse, error
 		return nil, errors.New("slack webhook url cannot be blank")
 	}
 
-	alert, err := NewAlert(input)
-	if err != nil {
-		return nil, err
-	}
+	alert := NewAlert(input)
 
 	metadata := concourse.NewBuildMetadata(input.Source.ConcourseURL)
 	send := !alert.Disabled
@@ -122,14 +151,6 @@ func main() {
 	}
 
 	src := os.Args[1]
-	if input.Params.FilePath != "" {
-		filepath := filepath.Join(src, input.Params.FilePath)
-		content, err := ioutil.ReadFile(filepath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		input.Params.Attachments = string(content)
-	}
 
 	o, err := out(input, src)
 	if err != nil {

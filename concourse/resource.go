@@ -29,15 +29,21 @@ type InResponse struct {
 	Metadata []Metadata `json:"metadata"`
 }
 
+type AttachmentMap struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+	File  string `json:"file"`
+}
+
 // OutParams are the paramaters that can be configured for the out operation.
 type OutParams struct {
-	AlertType   string `json:"alert_type"`
-	Message     string `json:"message"`
-	Color       string `json:"color"`
-	Disable     bool   `json:"disable"`
-	Channel     string `json:"channel"`
-	Attachments string `json:"attachments"`
-	FilePath    string `json:"file_path"`
+	AlertType   string          `json:"alert_type"`
+	Message     string          `json:"message"`
+	Color       string          `json:"color"`
+	Disable     bool            `json:"disable"`
+	Channel     string          `json:"channel"`
+	Attachments []AttachmentMap `json:"attachments"`
+	FilePath    string          `json:"file_path"`
 }
 
 // OutRequest is in the input for the out operation.

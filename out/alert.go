@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/a8m/envsubst"
 	"github.com/gnasr/concourse-slack-alert-resource/concourse"
 )
 
@@ -15,22 +12,14 @@ type Alert struct {
 	IconURL     string
 	Message     string
 	Disabled    bool
-	Attachments string
+	Attachments []concourse.AttachmentMap
 	File        string
 }
 
 // NewAlert constructs and returns an Alert.
-func NewAlert(input *concourse.OutRequest) (Alert, error) {
+func NewAlert(input *concourse.OutRequest) Alert {
 	var alert Alert
-
-	attachments, err := envsubst.String(input.Params.Attachments)
-	if err != nil {
-		return Alert{}, fmt.Errorf("Error while substituting varible: %s", err)
-	}
-
-	if attachments == "" {
-		attachments = "---"
-	}
+	attachments := input.Params.Attachments
 
 	switch input.Params.AlertType {
 	case "success":
@@ -106,5 +95,5 @@ func NewAlert(input *concourse.OutRequest) (Alert, error) {
 		alert.Color = input.Params.Color
 	}
 
-	return alert, err
+	return alert
 }
